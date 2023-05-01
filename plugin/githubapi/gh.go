@@ -33,7 +33,7 @@ func init() { // 插件主体
 	engine := control.Register("github-api", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "Github相关接口",
-		Help: "- gh set [token/repo/workflow] (超管私发)\n" +
+		Help: "- gh set [token / repo] (超管私发)\n" +
 			"- >gh action",
 		PrivateDataFolder: "github-api",
 	})
