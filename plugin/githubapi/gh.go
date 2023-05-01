@@ -30,7 +30,6 @@ var (
 )
 
 func init() { // 插件主体
-	log.Warnln("load gh plugin")
 	engine := control.Register("github-api", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "Github相关接口",
@@ -38,7 +37,7 @@ func init() { // 插件主体
 			"- >gh action",
 		PrivateDataFolder: "github-api",
 	})
-	log.Warnln("load gh plugin done")
+
 	cfgFile = engine.DataFolder() + "/config.json"
 	cacheDir = engine.DataFolder() + "/cache"
 	if file.IsExist(cacheDir) {
@@ -48,13 +47,8 @@ func init() { // 插件主体
 			return
 		}
 	}
-	log.Warnln("reload data...")
-	reload()
 
-	log.Warnln("engine....")
-	engine.OnPrefix("qq", zero.OnlyPrivate).SetBlock(true).Handle(func(ctx *zero.Ctx) {
-		ctx.SendChain(message.Text("Github API"))
-	})
+	reload()
 
 	engine.OnPrefix("gh set token", zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		getConfigVar(ctx, "token", func(value string) bool {
@@ -112,6 +106,11 @@ func init() { // 插件主体
 				return false
 			}
 
+			if len(arts.Artifacts) == 0{
+				ctx.SendChain(message.Text("没有产物"))
+				return true
+			}
+
 			msg = ""
 			for i, artifact := range arts.Artifacts {
 				msg += fmt.Sprintf("%d - (%dMiB)%s\n", i+1, artifact.SizeInBytes/1024/1024, artifact.Name)
@@ -137,10 +136,11 @@ func init() { // 插件主体
 					return true
 				}
 
-				absPath := filepath.Join(cacheDir, art.Name)
+				absFilePath := filepath.Join(file.BOTPATH, cacheDir, art.Name+".zip")
 				if debug {
-					absPath = "/data/data/com.termux/files/home/qq/download/" + art.Name
+					absFilePath = "/data/data/com.termux/files/home/qq/download/" + art.Name
 				}
+				ctx.SendChain(message.Text(fmt.Sprintf("下载完成，保存到: %s", absFilePath)))
 
 				if debug {
 					// 上传到SFTP 仅在调式时使用
@@ -151,8 +151,9 @@ func init() { // 插件主体
 					}
 					ctx.SendChain(message.Text(fmt.Sprintf("上传SFTP完成: %d", info.Size())))
 				} else {
-					_ = os.MkdirAll(absPath, 0666)
-					err = os.WriteFile(absPath, bytes, 0666)
+					_ = os.MkdirAll(filepath.Dir(absFilePath), 0666)
+
+					err = os.WriteFile(absFilePath, bytes, 0666)
 					if err != nil {
 						ctx.SendChain(message.Text(fmt.Sprintf("下载失败: %s", err)))
 						return true
@@ -160,7 +161,7 @@ func init() { // 插件主体
 				}
 
 				ctx.SendChain(message.Text(fmt.Sprintf("下载完成，上传到QQ: [%d]%s", num, art.Name)))
-				res := ctx.UploadThisGroupFile(absPath, art.Name, "")
+				res := ctx.UploadThisGroupFile(absFilePath, art.Name, "")
 				if res.Msg != "" {
 					ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(fmt.Sprintf("上传失败: %s", res.Msg)))
 				}
@@ -184,6 +185,7 @@ func waitNumMsg(ctx *zero.Ctx, onNum func(num int) bool) {
 		select {
 		case <-time.After(time.Second * 30):
 			ctx.SendChain(message.Text("指令过期"))
+			return
 		case c := <-recv:
 			msg := c.Event.Message.ExtractPlainText()
 			num, err := strconv.Atoi(msg)
