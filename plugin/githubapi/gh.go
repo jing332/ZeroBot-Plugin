@@ -30,6 +30,7 @@ var (
 )
 
 func init() { // 插件主体
+	log.Warnln("load gh plugin")
 	engine := control.Register("github-api", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "Github相关接口",
@@ -37,6 +38,7 @@ func init() { // 插件主体
 			"- >gh action",
 		PrivateDataFolder: "github-api",
 	})
+	log.Warnln("load gh plugin done")
 	cfgFile = engine.DataFolder() + "/config.json"
 	cacheDir = engine.DataFolder() + "/cache"
 	if file.IsExist(cacheDir) {
@@ -46,7 +48,13 @@ func init() { // 插件主体
 			return
 		}
 	}
+	log.Warnln("reload data...")
 	reload()
+
+	log.Warnln("engine....")
+	engine.OnPrefix("qq", zero.OnlyPrivate).SetBlock(true).Handle(func(ctx *zero.Ctx) {
+		ctx.SendChain(message.Text("Github API"))
+	})
 
 	engine.OnPrefix("gh set token", zero.OnlyPrivate, zero.SuperUserPermission).SetBlock(true).Handle(func(ctx *zero.Ctx) {
 		getConfigVar(ctx, "token", func(value string) bool {
