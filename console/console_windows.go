@@ -43,7 +43,7 @@ func init() {
 	var mode uint32
 	err := windows.GetConsoleMode(stdin, &mode)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	mode &^= windows.ENABLE_QUICK_EDIT_MODE // 禁用快速编辑模式

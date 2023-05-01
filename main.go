@@ -17,6 +17,8 @@ import (
 
 	"github.com/FloatTech/ZeroBot-Plugin/kanban" // 打印 banner
 
+	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/githubapi" // 违禁词
+
 	// ---------以下插件均可通过前面加 // 注释，注释后停用并不加载插件--------- //
 	// ----------------------插件优先级按顺序从高到低---------------------- //
 	//                                                                  //
@@ -31,7 +33,7 @@ import (
 	//                          vvvvvvvvvvvvvv                          //
 	//                               vvvv                               //
 
-	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/antiabuse" // 违禁词
+	/*_ "github.com/FloatTech/ZeroBot-Plugin/plugin/antiabuse" // 违禁词
 
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/chat" // 基础词库
 
@@ -179,7 +181,7 @@ import (
 
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/thesaurus" // 词典匹配回复
 
-	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/breakrepeat" // 打断复读
+	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/breakrepeat" // 打断复读*/
 
 	//                               ^^^^                               //
 	//                          ^^^^^^^^^^^^^^                          //
