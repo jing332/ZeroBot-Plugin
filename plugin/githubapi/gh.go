@@ -106,7 +106,7 @@ func init() { // 插件主体
 				return false
 			}
 
-			if len(arts.Artifacts) == 0{
+			if len(arts.Artifacts) == 0 {
 				ctx.SendChain(message.Text("没有产物"))
 				return true
 			}
@@ -161,7 +161,7 @@ func init() { // 插件主体
 				}
 
 				ctx.SendChain(message.Text(fmt.Sprintf("下载完成，上传到QQ: [%d]%s", num, art.Name)))
-				res := ctx.UploadThisGroupFile(absFilePath, art.Name, "")
+				res := ctx.UploadThisGroupFile(absFilePath, art.Name+".zip", "")
 				if res.Msg != "" {
 					ctx.SendChain(message.Reply(ctx.Event.MessageID), message.Text(fmt.Sprintf("上传失败: %s", res.Msg)))
 				}
